@@ -1,22 +1,20 @@
-# -------- Stage 1: Build the WAR file --------
+# ---------- Stage 1: Build WAR using Maven ----------
 FROM maven:3.9.3-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 COPY . .
 
-# Clean build WAR without Spring Boot plugin execution
+# Build the WAR file and skip tests
 RUN mvn clean install -DskipTests
 
-# -------- Stage 2: Use Tomcat to run the WAR --------
-FROM tomcat:9.0
+# ---------- Stage 2: Run using Spring Boot ----------
+FROM openjdk:17-jdk-slim
 
-# Remove default ROOT webapp
-RUN rm -rf /usr/local/tomcat/webapps/ROOT
+# Copy WAR file from build stage
+COPY --from=builder /app/target/*.war app.war
 
-# Copy WAR from builder stage to Tomcat's ROOT
-COPY --from=builder /app/target/*.war /usr/local/tomcat/webapps/ROOT.war
-
-# Match the Spring Boot server.port (8081)
+# App will run on 8081 (matches application.properties)
 EXPOSE 8081
 
-# Tomcat CMD remains default
+# Run the Spring Boot WAR directly
+ENTRYPOINT ["java", "-jar", "app.war"]
