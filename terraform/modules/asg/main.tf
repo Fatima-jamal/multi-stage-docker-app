@@ -1,7 +1,3 @@
-variable "launch_template_id" {}
-variable "subnet_ids" {}
-variable "alb_sg_id" {}
-
 resource "aws_autoscaling_group" "app_asg" {
   name                      = "java-app-asg"
   max_size                  = 3

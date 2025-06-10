@@ -14,6 +14,10 @@ variable "postgres_sg_id" {
   type = string
 }
 
+variable "mysql_sg_id" {
+  type = string
+}
+
 variable "db_username" {
   type = string
 }

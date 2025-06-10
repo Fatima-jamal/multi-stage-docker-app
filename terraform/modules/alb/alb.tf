@@ -17,7 +17,7 @@ resource "aws_lb" "app_alb" {
 }
 
 resource "aws_lb_target_group" "app_tg" {
-  name     = "java-app-tg"
+  name     = "java-app-tg-1"
   port     = var.target_port
   protocol = "HTTP"
   vpc_id   = var.vpc_id

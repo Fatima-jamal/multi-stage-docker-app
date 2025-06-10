@@ -1,7 +1,7 @@
-output "rds_endpoint" {
+output "postgres_endpoint" {
   value = aws_db_instance.postgres.endpoint
 }
 
-output "rds_identifier" {
-  value = aws_db_instance.postgres.id
+output "mysql_endpoint" {
+  value = aws_db_instance.mysql.endpoint
 }
