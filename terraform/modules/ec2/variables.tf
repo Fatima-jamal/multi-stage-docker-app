@@ -28,3 +28,8 @@ variable "instance_type" {
   type        = string
   default     = "t3.micro"
 }
+
+variable "target_group_arn" {
+  description = "ARN of the Target Group to attach with ASG"
+  type        = string
+}

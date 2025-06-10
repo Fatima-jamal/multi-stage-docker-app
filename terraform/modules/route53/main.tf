@@ -1,21 +1,10 @@
-variable "domain_name" {
-  type = string
+data "aws_route53_zone" "primary" {
+  zone_id = var.hosted_zone_id
 }
 
-variable "alb_dns_name" {
-  type = string
-}
-
-variable "alb_zone_id" {
-  type = string
-}
-
-resource "aws_route53_zone" "primary" {
-  name = var.domain_name
-}
 
 resource "aws_route53_record" "metabase" {
-  zone_id = aws_route53_zone.primary.zone_id
+  zone_id = data.aws_route53_zone.primary.zone_id
   name    = "metabase.${var.domain_name}"
   type    = "A"
 
@@ -24,8 +13,4 @@ resource "aws_route53_record" "metabase" {
     zone_id                = var.alb_zone_id
     evaluate_target_health = true
   }
-}
-
-output "name_servers" {
-  value = aws_route53_zone.primary.name_servers
 }

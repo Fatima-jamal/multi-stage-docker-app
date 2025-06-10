@@ -1,40 +1,9 @@
-variable "vpc_id" {}
-
-# Allow HTTP traffic from ALB to EC2
-resource "aws_security_group" "ec2_sg" {
-  name        = "ec2-sg"
-  description = "Allow traffic from ALB"
-  vpc_id      = var.vpc_id
-
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Will be refined later if needed
-  }
-
-  ingress {
-  from_port   = 22
-  to_port     = 22
-  protocol    = "tcp"
-  cidr_blocks = ["0.0.0.0/0"]
-  description = "Allow SSH for debugging"
+variable "vpc_id" {
+  description = "The ID of the VPC"
+  type        = string
 }
 
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "ec2-sg"
-  }
-}
-
-# ALB Security Group — Open to Public Internet
+# ALB Security Group - Allows HTTP from anywhere
 resource "aws_security_group" "alb_sg" {
   name        = "alb-sg"
   description = "Allow HTTP from anywhere"
@@ -59,10 +28,77 @@ resource "aws_security_group" "alb_sg" {
   }
 }
 
-output "ec2_sg_id" {
-  value = aws_security_group.ec2_sg.id
+# App Security Group - Allows 8080 from ALB
+resource "aws_security_group" "app_sg" {
+  name        = "app-sg"
+  description = "Allow app traffic from ALB"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port       = 8080
+    to_port         = 8080
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "app-sg"
+  }
 }
 
-output "alb_sg_id" {
-  value = aws_security_group.alb_sg.id
+# PostgreSQL Security Group
+resource "aws_security_group" "postgres_sg" {
+  name        = "postgres-sg"
+  description = "Allow PostgreSQL access"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "postgres-sg"
+  }
+}
+
+# MySQL Security Group
+resource "aws_security_group" "mysql_sg" {
+  name        = "mysql-sg-v2"
+  description = "Allow MySQL access"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 3306
+    to_port     = 3306
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "mysql-sg"
+  }
 }
