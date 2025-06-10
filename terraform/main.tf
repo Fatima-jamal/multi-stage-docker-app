@@ -63,7 +63,7 @@ module "rds" {
   private_subnet_a_id = module.vpc.private_subnet_a_id
   private_subnet_b_id = module.vpc.private_subnet_b_id
   postgres_sg_id      = module.rds_sg.postgres_sg_id
-  mysql_sg_id         = module.rds_sg.mysql_sg_id            # ✅ added
+  mysql_sg_id         = module.rds_sg.mysql_sg_id           
   db_username         = "postgresadmin"
   db_password         = "StrongPassword123!"
 }
